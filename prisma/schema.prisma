@@ -28,7 +28,7 @@ model Podcast {
   key         String?
   created_at  DateTime @default(now())
 
-  podcasts Playlist[]
+  playlists Playlist[]
 }
 
 model Playlist {
@@ -37,6 +37,6 @@ model Playlist {
   description String?
   podcasts    Podcast[]
 
-  User   User?   @relation(fields: [userId], references: [id])
+  User   User?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String?
 }

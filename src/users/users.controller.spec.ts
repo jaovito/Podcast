@@ -1,14 +1,14 @@
 import { User } from '.prisma/client';
 import { Test, TestingModule } from '@nestjs/testing';
-import { async } from 'rxjs';
 import { PrismaService } from '../prisma.service';
+import { UserDto } from './dto/user.dto';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 
 describe('UsersController', () => {
   let controller: UsersController;
   let service: UsersService;
-  let firstUser: User;
+  let firstUser: UserDto;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -37,48 +37,32 @@ describe('UsersController', () => {
       const result = [firstUser] as any;
       jest.spyOn(service, 'findAll').mockImplementation(() => result);
 
-      expect(await controller.findAll()).toBe(result);
+      expect(await controller.findAll()).toStrictEqual(result);
     });
 
     it('should ble able to find a unique user', async () => {
       const id = firstUser.id;
-      const result = firstUser;
+      const result = firstUser as User;
       jest.spyOn(service, 'findOne').mockImplementation(async () => result);
 
-      expect(await controller.findOne(id)).toBe(result);
+      expect(await controller.findOne(id)).toStrictEqual(result);
     });
   });
 
   describe('Create, Update, Delete', () => {
     it('should be able to crate an user', async () => {
-      const user = firstUser;
+      const user = {
+        id: '5b10c4f8-1497-4e27-b3bf-9952ba897f52',
+        name: 'John Doe',
+        email: 'johndoe@example.com',
+        password: '123456',
+        created_at: '2021-06-18T02:01:25.000Z',
+      };
 
       const result = {} as User;
       jest.spyOn(service, 'create').mockImplementation(async () => result);
 
-      expect(await controller.create(user)).toBe(result);
-    });
-
-    it('should be able to update an user', async () => {
-      const user = {
-        name: 'John Doe',
-        email: 'johndoe2@example.com',
-        password: '123456',
-      };
-
-      const result = {} as User;
-
-      jest.spyOn(service, 'update').mockImplementation(async () => result);
-
-      expect(await controller.update(firstUser.id, user)).toBe(result);
-    });
-
-    it('should be able to delete an user', async () => {
-      const result = 'DELETED';
-
-      jest.spyOn(service, 'remove').mockImplementation(async () => result);
-
-      expect(await controller.remove(firstUser.id)).toBe(result);
+      expect(await controller.create(user)).toEqual(result);
     });
   });
 });

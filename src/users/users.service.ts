@@ -19,13 +19,13 @@ export class UsersService {
       throw new HttpException('User already exists', 400);
     }
 
-    const hashPassword = await bcrypt.hashSync(
+    const hashPassword = bcrypt.hashSync(
       createUserDto.password,
-      process.env.HASH_PASSWORD,
+      Number(process.env.HASH_PASSWORD),
     );
 
     const user = await this.prisma.user.create({
-      data: { password: hashPassword, ...createUserDto },
+      data: { ...createUserDto, password: hashPassword },
     });
 
     return user;
@@ -34,7 +34,7 @@ export class UsersService {
   async findAll(): Promise<User[]> {
     const users = await this.prisma.user.findMany({
       orderBy: {
-        created_at: 'asc',
+        created_at: 'desc',
       },
     });
 
@@ -49,14 +49,28 @@ export class UsersService {
     return user;
   }
 
+  async findByEmail(email: string): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    return user;
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const hashPassword = await bcrypt.hashSync(
-      updateUserDto.password,
-      process.env.HASH_PASSWORD,
-    );
+    let hashPassword = '';
+
+    if (updateUserDto.password) {
+      hashPassword = bcrypt.hashSync(
+        updateUserDto.password,
+        Number(process.env.HASH_PASSWORD),
+      );
+    }
 
     const user = await this.prisma.user.update({
-      data: { password: hashPassword, ...updateUserDto },
+      data: updateUserDto.password
+        ? { ...updateUserDto, password: hashPassword }
+        : updateUserDto,
       where: { id },
     });
 
