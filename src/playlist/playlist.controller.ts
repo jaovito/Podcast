@@ -1,34 +1,52 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { PlaylistService } from './playlist.service';
 import { CreatePlaylistDto } from './dto/create-playlist.dto';
 import { UpdatePlaylistDto } from './dto/update-playlist.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import PlaylistViews from './views/PlaylistViews';
 
 @Controller('playlist')
 export class PlaylistController {
   constructor(private readonly playlistService: PlaylistService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createPlaylistDto: CreatePlaylistDto) {
-    return this.playlistService.create(createPlaylistDto);
+  async create(@Body() createPlaylistDto: CreatePlaylistDto, @Request() req) {
+    return await this.playlistService.create(createPlaylistDto, req.user.id);
   }
 
   @Get()
-  findAll() {
-    return this.playlistService.findAll();
+  async findAll() {
+    return PlaylistViews.renderMany(await this.playlistService.findAll());
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.playlistService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return PlaylistViews.render(await this.playlistService.findOne(id));
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePlaylistDto: UpdatePlaylistDto) {
-    return this.playlistService.update(+id, updatePlaylistDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updatePlaylistDto: UpdatePlaylistDto,
+  ) {
+    return PlaylistViews.render(
+      await this.playlistService.update(id, updatePlaylistDto),
+    );
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.playlistService.remove(+id);
+  async remove(@Param('id') id: string) {
+    return await this.playlistService.remove(id);
   }
 }

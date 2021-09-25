@@ -1,26 +1,69 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { CreatePlaylistDto } from './dto/create-playlist.dto';
 import { UpdatePlaylistDto } from './dto/update-playlist.dto';
+import { PrismaService } from 'src/prisma.service';
+import UserView from 'src/users/views/UserView';
 
 @Injectable()
 export class PlaylistService {
-  create(createPlaylistDto: CreatePlaylistDto) {
-    return 'This action adds a new playlist';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(createPlaylistDto: CreatePlaylistDto, userId: string) {
+    if (!userId || !createPlaylistDto) {
+      throw new HttpException('Invalid data', 400);
+    }
+
+    const playList = await this.prisma.playlist.create({
+      data: {
+        ...createPlaylistDto,
+        userId,
+      },
+    });
+
+    return playList;
   }
 
-  findAll() {
-    return `This action returns all playlist`;
+  async findAll() {
+    const playlists = await this.prisma.playlist.findMany({
+      include: {
+        User: true,
+        podcasts: true,
+      },
+    });
+
+    return playlists;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} playlist`;
+  async findOne(id: string) {
+    const playlist = await this.prisma.playlist.findUnique({
+      where: { id },
+      include: {
+        User: true,
+        podcasts: true,
+      },
+    });
+
+    return playlist;
   }
 
-  update(id: number, updatePlaylistDto: UpdatePlaylistDto) {
-    return `This action updates a #${id} playlist`;
+  async update(id: string, updatePlaylistDto: UpdatePlaylistDto) {
+    const playlist = await this.prisma.playlist.update({
+      data: updatePlaylistDto,
+      where: { id },
+      include: {
+        User: true,
+        podcasts: true,
+      },
+    });
+
+    return playlist;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} playlist`;
+  async remove(id: string) {
+    await this.prisma.playlist.delete({
+      where: { id },
+    });
+
+    return 'DELETED';
   }
 }

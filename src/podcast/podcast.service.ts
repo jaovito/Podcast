@@ -53,6 +53,21 @@ export class PodcastService {
     return podcast;
   }
 
+  async addToPlaylist(id: string, playlistId: string) {
+    await this.prisma.podcast.update({
+      data: {
+        playlists: {
+          connect: {
+            id: playlistId,
+          },
+        },
+      },
+      where: { id },
+    });
+
+    return 'ADDED';
+  }
+
   async remove(id: string) {
     const podcast = await this.prisma.podcast.findUnique({
       where: { id },

@@ -11,6 +11,7 @@ import {
   Res,
   StreamableFile,
   UseGuards,
+  HttpException,
 } from '@nestjs/common';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -31,6 +32,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 export class PodcastController {
   constructor(private readonly podcastService: PodcastService) {}
 
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
@@ -59,11 +61,20 @@ export class PodcastController {
     return this.podcastService.create(body);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post('/playlist')
+  addToPlaylist(@Body() body) {
+    const { id, playlist_id } = body;
+
+    return this.podcastService.addToPlaylist(id, playlist_id);
+  }
+
   @Get()
   findAll() {
     return this.podcastService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':song')
   seeUploadedFile(@Param('song') song, @Res() res) {
     return res.sendFile(song, { root: './files' });
@@ -73,6 +84,10 @@ export class PodcastController {
   @Get('/stream/:id')
   async streamFile(@Param('id') id): Promise<StreamableFile> {
     const podcast = await this.podcastService.findOne(id);
+
+    if (!podcast) {
+      throw new HttpException('Podcast does not exists', 400);
+    }
 
     const file = createReadStream(
       join(process.cwd(), `./files/${podcast.key}`),
@@ -111,6 +126,7 @@ export class PodcastController {
     return this.podcastService.update(id, body);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.podcastService.remove(id);
