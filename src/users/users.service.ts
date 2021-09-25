@@ -50,8 +50,13 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const hashPassword = await bcrypt.hashSync(
+      updateUserDto.password,
+      process.env.HASH_PASSWORD,
+    );
+
     const user = await this.prisma.user.update({
-      data: updateUserDto,
+      data: { password: hashPassword, ...updateUserDto },
       where: { id },
     });
 
@@ -59,6 +64,10 @@ export class UsersService {
   }
 
   async remove(id: string) {
-    return `This action removes a #${id} user`;
+    await this.prisma.user.delete({
+      where: { id },
+    });
+
+    return `DELETED`;
   }
 }

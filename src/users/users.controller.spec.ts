@@ -1,5 +1,6 @@
 import { User } from '.prisma/client';
 import { Test, TestingModule } from '@nestjs/testing';
+import { async } from 'rxjs';
 import { PrismaService } from '../prisma.service';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
@@ -56,6 +57,28 @@ describe('UsersController', () => {
       jest.spyOn(service, 'create').mockImplementation(async () => result);
 
       expect(await controller.create(user)).toBe(result);
+    });
+
+    it('should be able to update an user', async () => {
+      const user = {
+        name: 'John Doe',
+        email: 'johndoe2@example.com',
+        password: '123456',
+      };
+
+      const result = {} as User;
+
+      jest.spyOn(service, 'update').mockImplementation(async () => result);
+
+      expect(await controller.update(firstUser.id, user)).toBe(result);
+    });
+
+    it('should be able to delete an user', async () => {
+      const result = 'DELETED';
+
+      jest.spyOn(service, 'remove').mockImplementation(async () => result);
+
+      expect(await controller.remove(firstUser.id)).toBe(result);
     });
   });
 });
