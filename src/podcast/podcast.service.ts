@@ -1,5 +1,5 @@
-import { HttpException, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma.service';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma.service';
 import { CreatePodcastDto } from './dto/create-podcast.dto';
 import { UpdatePodcastDto } from './dto/update-podcast.dto';
 import * as fs from 'fs';

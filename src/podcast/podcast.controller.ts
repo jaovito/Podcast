@@ -25,7 +25,7 @@ import { editFileName, imageFileFilter } from './audioFilter';
 import { FileUploadDto } from './dto/fileUpload.dto';
 import { createReadStream } from 'fs';
 import { join } from 'path';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('Podcasts')
 @Controller('podcast')

@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { PodcastModule } from './podcast/podcast.module';
@@ -22,6 +21,5 @@ import { PlaylistModule } from './playlist/playlist.module';
     PlaylistModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

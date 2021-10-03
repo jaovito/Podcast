@@ -1,8 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { CreatePlaylistDto } from './dto/create-playlist.dto';
 import { UpdatePlaylistDto } from './dto/update-playlist.dto';
-import { PrismaService } from 'src/prisma.service';
-import UserView from 'src/users/views/UserView';
+import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class PlaylistService {

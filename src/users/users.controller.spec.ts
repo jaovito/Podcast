@@ -64,5 +64,38 @@ describe('UsersController', () => {
 
       expect(await controller.create(user)).toEqual(result);
     });
+
+    it('should be able to update an user', async () => {
+      const id = firstUser.id;
+      const updateUser = {
+        id: '5b10c4f8-1497-4e27-b3bf-9952ba897f52',
+        name: 'John Doe Edited',
+        email: 'johndoeediy@example.com',
+        password: 'johndoe123',
+        created_at: '2021-06-18T02:01:25.000Z',
+      };
+
+      const req = { user: updateUser };
+
+      const result = {} as User;
+      jest.spyOn(service, 'update').mockImplementation(async () => result);
+
+      expect(await controller.update(id, updateUser, req)).toEqual(result);
+    });
+
+    it('should be able to delete an user', async () => {
+      const id = firstUser.id;
+
+      const req = {
+        user: {
+          id,
+        },
+      };
+
+      const result = 'DELETED';
+      jest.spyOn(service, 'remove').mockImplementation(async () => result);
+
+      expect(await controller.remove(id, req)).toEqual(result);
+    });
   });
 });
